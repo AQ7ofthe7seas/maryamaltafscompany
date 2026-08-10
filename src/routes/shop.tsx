@@ -10,16 +10,13 @@ import {
   Label,
   Section,
   SectionHeading,
-  Stars,
 } from "@/components/site/Primitives";
 import {
   EDITIONS,
-  GIFT_WRAP_PRICE_GBP,
-  NOTEBOOK_PRICE_GBP,
+  NOTEBOOK_PRICE_USD,
   SHIPPING_REGIONS,
   materials,
   spreads,
-  testimonials,
 } from "@/lib/content";
 import { createCheckoutSession } from "@/lib/checkout";
 import spreadDesk from "@/assets/spread-desk.jpg";
@@ -35,17 +32,16 @@ export const Route = createFileRoute("/shop")({
   validateSearch: shopSearch,
   head: () => ({
     meta: [
-      { title: "Shop the Monarch Notebook — £68" },
+      { title: "Shop the Monarch Notebook — $26 (Starter Edition)" },
       {
         name: "description",
         content:
-          "Choose your cover, binding and edition. Premium vegan leather, gold foil, 120gsm undated pages, rigid gift box. Shipped worldwide.",
+          "A5, 120 pages, fully custom interior. Islamic or Flexible edition. Made to order, ships from the US.",
       },
-      { property: "og:title", content: "Shop the Monarch Notebook — £68" },
+      { property: "og:title", content: "Shop the Monarch Notebook — $26 (Starter Edition)" },
       {
         property: "og:description",
-        content:
-          "Six muted covers, two bindings, Classic or Islamic edition. Gift wrap available.",
+        content: "Islamic or Flexible edition. Made to order, no two batches held in a warehouse.",
       },
     ],
   }),
@@ -54,37 +50,29 @@ export const Route = createFileRoute("/shop")({
 
 const gallery = [
   [spreadDesk, "Open spread with gold rules on an oak desk"],
-  [packaging, "Rigid gift box, tissue paper and wax seal"],
+  [packaging, "Notebook packaging"],
   [lifeDesk, "Notebook and coffee in morning light"],
   [lifeMountains, "Notebook by a window overlooking mountains"],
 ] as const;
 
-const bundle = [
-  ["Monarch Notebook", "£68"],
-  ["Brass fountain pen", "£34"],
-  ["Refill page pack", "£12"],
-];
-
 function Shop() {
   const search = useSearch({ from: "/shop" });
   const [zoom, setZoom] = useState(0);
-  const [edition, setEdition] = useState<(typeof EDITIONS)[number]>("Classic Edition");
-  const [gift, setGift] = useState(false);
+  const [edition, setEdition] = useState<(typeof EDITIONS)[number]>(EDITIONS[0]);
   const [qty, setQty] = useState(1);
   const [region, setRegion] = useState(0);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  const unit = NOTEBOOK_PRICE_GBP;
-  const total =
-    unit * qty + (gift ? GIFT_WRAP_PRICE_GBP : 0) + SHIPPING_REGIONS[region]!.priceGBP;
+  const unit = NOTEBOOK_PRICE_USD;
+  const total = unit * qty + SHIPPING_REGIONS[region]!.priceUSD;
 
   const handleCheckout = async () => {
     setCheckoutError(null);
     setIsCheckingOut(true);
     try {
       const { url } = await createCheckoutSession({
-        data: { edition, giftWrap: gift, quantity: qty, regionIndex: region },
+        data: { edition, quantity: qty, regionIndex: region },
       });
       window.location.href = url;
     } catch {
@@ -110,14 +98,13 @@ function Shop() {
         <div className="grid gap-16 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
             <Reveal>
-              <Label>Monarch · One notebook for everything</Label>
+              <Label>Monarch · Starter Edition</Label>
               <h1 className="mt-6 text-5xl leading-[1.05] md:text-6xl">
                 The Monarch Notebook
               </h1>
-              <div className="mt-6 flex items-center gap-4">
-                <Stars />
-                <span className="text-sm text-muted-foreground">4.9 · 2,140 reviews</span>
-              </div>
+              <p className="mt-6 text-sm text-muted-foreground">
+                Made to order — every notebook is printed after you order, not pulled from a warehouse shelf.
+              </p>
               <GoldRule className="my-10 w-24" />
             </Reveal>
 
@@ -184,8 +171,8 @@ function Shop() {
           <div className="lg:sticky lg:top-28 lg:self-start">
             <Card className="p-8 md:p-10">
               <div className="flex items-baseline justify-between">
-                <span className="font-[family-name:var(--font-display)] text-4xl">£{unit}</span>
-                <span className="label-xs">Free UK delivery</span>
+                <span className="font-[family-name:var(--font-display)] text-4xl">${unit}</span>
+                <span className="label-xs">Free US shipping</span>
               </div>
               <GoldRule className="my-8" />
 
@@ -204,28 +191,11 @@ function Shop() {
                     <span className="block">{e}</span>
                     <span className="mt-1 block text-xs text-muted-foreground">
                       {e === "Islamic Edition"
-                        ? "Includes prayer, Ramadan and Qur'an spreads"
-                        : "Without the prayer spreads"}
+                        ? "Prayer tracker, Hijri dates and Ramadan spreads"
+                        : "Same core layout, no faith-specific spreads"}
                     </span>
                   </button>
                 ))}
-              </div>
-
-              <div className="mt-8 flex items-center justify-between">
-                <Label>Gift wrap · £6</Label>
-                <button
-                  onClick={() => setGift((g) => !g)}
-                  aria-pressed={gift}
-                  className={`relative h-7 w-12 rounded-full border transition-colors duration-500 ${
-                    gift ? "border-gold bg-gold/30" : "border-border bg-secondary"
-                  }`}
-                >
-                  <span
-                    className={`absolute top-1 h-5 w-5 rounded-full bg-navy transition-all duration-500 ${
-                      gift ? "left-6" : "left-1"
-                    }`}
-                  />
-                </button>
               </div>
 
               <div className="mt-8 flex items-center justify-between">
@@ -244,7 +214,7 @@ function Shop() {
               <div className="mt-8">
                 <Label>Shipping estimate</Label>
                 <div className="mt-4 grid gap-2">
-                  {SHIPPING_REGIONS.map(({ name, eta, priceGBP }, i) => (
+                  {SHIPPING_REGIONS.map(({ name, eta, priceUSD }, i) => (
                     <button
                       key={name}
                       onClick={() => setRegion(i)}
@@ -254,7 +224,7 @@ function Shop() {
                     >
                       <span>{name}</span>
                       <span className="text-muted-foreground">
-                        {eta} · {priceGBP > 0 ? `£${priceGBP}` : "Free"}
+                        {eta} · {priceUSD > 0 ? `$${priceUSD}` : "Free"}
                       </span>
                     </button>
                   ))}
@@ -264,7 +234,7 @@ function Shop() {
               <GoldRule className="my-8" />
               <div className="flex items-baseline justify-between">
                 <span className="label-xs">Total</span>
-                <span className="font-[family-name:var(--font-display)] text-3xl">£{total}</span>
+                <span className="font-[family-name:var(--font-display)] text-3xl">${total}</span>
               </div>
               <Action
                 size="lg"
@@ -272,40 +242,16 @@ function Shop() {
                 onClick={handleCheckout}
                 disabled={isCheckingOut}
               >
-                {isCheckingOut ? "Redirecting…" : "Add to bag"}
+                {isCheckingOut ? "Redirecting…" : "Order"}
               </Action>
               {checkoutError ? (
                 <p className="mt-3 text-center text-xs text-destructive">{checkoutError}</p>
               ) : null}
               <p className="mt-5 text-center text-xs text-muted-foreground">
-                {edition} · {gift ? "Gift wrapped" : "Standard packaging"} · 30-day returns
+                {edition} · made to order · replaced free if it arrives damaged
               </p>
             </Card>
           </div>
-        </div>
-      </Section>
-
-      {/* ---------------- Frequently bought together ---------------- */}
-      <Section tone="deep">
-        <SectionHeading
-          label="Frequently bought together"
-          title="The complete desk."
-          intro="Add the brass pen and a refill pack — £108 together, saving £6."
-        />
-        <div className="mt-20 grid gap-6 md:grid-cols-3">
-          {bundle.map(([name, price], i) => (
-            <Reveal key={name} delay={i * 80}>
-              <Card className="flex h-full flex-col justify-between">
-                <div>
-                  <Label>{`0${i + 1}`}</Label>
-                  <h3 className="mt-5 text-3xl">{name}</h3>
-                </div>
-                <p className="mt-8 font-[family-name:var(--font-display)] text-2xl gold-text">
-                  {price}
-                </p>
-              </Card>
-            </Reveal>
-          ))}
         </div>
       </Section>
 
@@ -325,34 +271,15 @@ function Shop() {
         </div>
       </Section>
 
-      {/* ---------------- Reviews ---------------- */}
-      <Section tone="paper">
-        <SectionHeading label="Reviews" title="4.9 from 2,140 people." />
-        <div className="mt-20 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6 md:grid md:grid-cols-3 md:overflow-visible">
-          {testimonials.slice(0, 3).map((t, i) => (
-            <Reveal key={t.name} delay={i * 80} className="min-w-[85%] snap-center md:min-w-0">
-              <Card className="h-full">
-                <Stars />
-                <p className="mt-6 font-[family-name:var(--font-display)] text-xl leading-relaxed">
-                  “{t.quote}”
-                </p>
-                <p className="mt-8 text-sm">{t.name}</p>
-                <p className="text-xs text-muted-foreground">{t.role}</p>
-              </Card>
-            </Reveal>
-          ))}
-        </div>
-      </Section>
-
       {/* mobile sticky purchase bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-background/95 px-5 py-4 backdrop-blur-xl lg:hidden">
         <div className="flex items-center justify-between gap-4">
           <span>
-            <span className="block font-[family-name:var(--font-display)] text-2xl">£{total}</span>
+            <span className="block font-[family-name:var(--font-display)] text-2xl">${total}</span>
             <span className="block text-[0.66rem] text-muted-foreground">{edition}</span>
           </span>
           <Action size="lg" className="flex-1" onClick={handleCheckout} disabled={isCheckingOut}>
-            {isCheckingOut ? "Redirecting…" : "Add to bag"}
+            {isCheckingOut ? "Redirecting…" : "Order"}
           </Action>
         </div>
       </div>

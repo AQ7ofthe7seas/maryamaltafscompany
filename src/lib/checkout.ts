@@ -1,11 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import Stripe from "stripe";
 import { z } from "zod";
-import { EDITIONS, GIFT_WRAP_PRICE_GBP, NOTEBOOK_PRICE_GBP, SHIPPING_REGIONS } from "@/lib/content";
+import { EDITIONS, NOTEBOOK_PRICE_USD, SHIPPING_REGIONS } from "@/lib/content";
 
 const checkoutInput = z.object({
   edition: z.enum(EDITIONS),
-  giftWrap: z.boolean(),
   quantity: z.number().int().min(1).max(9),
   regionIndex: z
     .number()
@@ -34,32 +33,21 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       {
         quantity: data.quantity,
         price_data: {
-          currency: "gbp",
-          unit_amount: NOTEBOOK_PRICE_GBP * 100,
+          currency: "usd",
+          unit_amount: NOTEBOOK_PRICE_USD * 100,
           product_data: {
-            name: `Monarch Notebook — ${data.edition}`,
+            name: `Monarch Notebook — ${data.edition} (Starter Edition)`,
           },
         },
       },
     ];
 
-    if (data.giftWrap) {
+    if (region.priceUSD > 0) {
       lineItems.push({
         quantity: 1,
         price_data: {
-          currency: "gbp",
-          unit_amount: GIFT_WRAP_PRICE_GBP * 100,
-          product_data: { name: "Gift wrap" },
-        },
-      });
-    }
-
-    if (region.priceGBP > 0) {
-      lineItems.push({
-        quantity: 1,
-        price_data: {
-          currency: "gbp",
-          unit_amount: region.priceGBP * 100,
+          currency: "usd",
+          unit_amount: region.priceUSD * 100,
           product_data: { name: `Shipping — ${region.name}` },
         },
       });

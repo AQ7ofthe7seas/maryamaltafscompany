@@ -248,32 +248,25 @@ export const spreads: Spread[] = [
   },
 ];
 
-export const EDITIONS = ["Classic Edition", "Islamic Edition"] as const;
+export const EDITIONS = ["Islamic Edition", "Flexible Edition"] as const;
 export type Edition = (typeof EDITIONS)[number];
 
-export const NOTEBOOK_PRICE_GBP = 68;
-export const GIFT_WRAP_PRICE_GBP = 6;
+// Starter Edition economics: true print-on-demand (Prodigi), no held inventory.
+// Simpler physical spec than the original leather/gold concept — see materials list below.
+export const NOTEBOOK_PRICE_USD = 26;
 
 export const SHIPPING_REGIONS = [
-  { name: "United Kingdom", eta: "2–3 working days", priceGBP: 0 },
-  { name: "Europe", eta: "3–4 working days", priceGBP: 6 },
-  { name: "North America", eta: "4–7 working days", priceGBP: 9 },
-  { name: "Rest of world", eta: "7–12 working days", priceGBP: 12 },
+  { name: "United States", eta: "5–8 business days", priceUSD: 0 },
+  { name: "Canada", eta: "7–10 business days", priceUSD: 5 },
+  { name: "Rest of world", eta: "10–18 business days", priceUSD: 9 },
 ] as const;
 
 export const materials = [
-  ["Premium vegan leather cover", "Soft-touch, warm to hold, ages beautifully."],
-  ["Gold foil stamping", "Real foil press, not printed ink."],
-  ["Thick premium paper", "120gsm, cream-toned, minimal ghosting."],
-  ["Fountain pen friendly", "Tested across fine, medium and broad nibs."],
-  ["Rounded corners", "Survives bags, desks, years."],
-  ["Ribbon bookmark", "Woven, colour-matched to the cover."],
-  ["Elastic closure", "Firm without marking the cover."],
-  ["Lay-flat binding", "Opens fully at every single page."],
-  ["Strong spiral option", "Aluminium coil for folding right back."],
-  ["Expandable back pocket", "Tickets, notes, photographs."],
-  ["Pen holder", "Integrated loop on the spine."],
-  ["Premium packaging", "Rigid box, tissue, wax seal — gift ready."],
+  ["Fully custom interior", "Important Dates, Personal Thoughts, Gratitude, Schedule and more — every page designed, not generic."],
+  ["True lay-flat binding", "Wire-O binding that folds all the way back. No fighting the spine."],
+  ["A5, 120 pages", "Portrait format, sized to actually carry with you."],
+  ["Printed cover art", "Celestial and gold-tone design printed edge to edge."],
+  ["Everyday writing paper", "Smooth 100gsm stock, built for daily use."],
 ];
 
 export const testimonials = [
